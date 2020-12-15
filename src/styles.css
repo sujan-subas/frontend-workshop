@@ -1,0 +1,23 @@
+.header,
+.body,
+.actions {
+  padding: 10px 50px;
+}
+.header {
+  border-bottom: 1px solid #dedede;
+  display: flex;
+}
+form {
+  margin-bottom: 10px;
+}
+label,
+button {
+  margin: 0 10px;
+}
+input,
+button {
+  border: 1px solid #dedede;
+}
+button {
+  white-space: nowrap;
+}

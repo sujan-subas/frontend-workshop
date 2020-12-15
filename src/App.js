@@ -1,25 +1,64 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import { CogniteClient } from '@cognite/sdk'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const project = 'academy'
+
+class App extends Component {
+  state = {
+    client: null,
+    assets: null,
+  }
+
+  async componentDidMount() {
+    const client = new CogniteClient({ appId: 'Workshop' })
+    client.loginWithOAuth({
+      project,
+      onAuthenticate: 'REDIRECT',
+    })
+    this.setState({ client })
+    // Login will be triggered on first API call with "client"
+    // You can manually trigger the login flow by calling:
+    client.authenticate()
+  }
+
+  fetchRootAssets = async () => {
+    const { client } = this.state
+    if (client === null) return
+    // fetch the first 10 (maximum) assets
+    const assets = await client.assets.list().autoPagingToArray({ limit: 10 })
+    this.setState({ assets })
+  }
+
+  renderAssetsInTable = (assets) => {
+    return (
+      <table>
+        <tbody>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+          {assets.map((asset) => (
+            <tr key={asset.id}>
+              <td>{asset.name}</td>
+              <td>{asset.description}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )
+  }
+
+  render() {
+    const { assets } = this.state
+    return (
+      <div className='App'>
+        <button onClick={this.fetchRootAssets}>
+          <h1>Click here to fetch assets from Cognite</h1>
+        </button>
+        {assets && this.renderAssetsInTable(assets)}
+      </div>
+    )
+  }
 }
 
-export default App;
+export default App
